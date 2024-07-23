@@ -1,17 +1,30 @@
 package org.example.kurakani.dto;
 
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConnectionRequestDto {
+    private Long id;
     private String senderUsername;
     private String receiverUsername;
     private boolean accepted;
 
-    public ConnectionRequestDto() {
-    }
-
-    public ConnectionRequestDto(String senderUsername, String receiverUsername, boolean accepted) {
+    // Constructor
+    public ConnectionRequestDto(Long id, String senderUsername, String receiverUsername, boolean accepted) {
+        this.id = id;
         this.senderUsername = senderUsername;
         this.receiverUsername = receiverUsername;
         this.accepted = accepted;
+    }
+
+    // Getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getSenderUsername() {
