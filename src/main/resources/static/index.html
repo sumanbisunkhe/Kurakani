@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat WebSocket</title>
+  <script src="/js/sockjs-0.3.4.js"></script>
+  <script src="/js/stomp.js"></script>
+  <script type="text/javascript">
+    var stompClient = null;
+
+    function setConnected(connected) {
+      document.getElementById('connect').disabled = connected;
+      document.getElementById('disconnect').disabled = !connected;
+      document.getElementById('conversationDiv').style.display = connected ? 'block' : 'none';
+      document.getElementById('response').innerHTML = '';
+    }
+
+    function connect() {
+      var socket = new SockJS('/chat');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, function(frame) {
+        setConnected(true);
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/topic/messages', function(messageOutput) {
+          showMessageOutput(JSON.parse(messageOutput.body));
+        });
+      });
+    }
+
+    function disconnect() {
+      if (stompClient != null) {
+        stompClient.disconnect();
+      }
+      setConnected(false);
+      console.log("Disconnected");
+    }
+
+    function sendMessage() {
+      var fromUser = document.getElementById('from').value;
+      var toUser = document.getElementById('to').value;
+      var text = document.getElementById('text').value;
+      stompClient.send("/app/chat", {}, JSON.stringify({'fromUser': fromUser, 'toUser': toUser, 'text': text}));
+    }
+
+    function showMessageOutput(messageOutput) {
+      var response = document.getElementById('response');
+      var p = document.createElement('p');
+      p.style.wordWrap = 'break-word';
+      p.innerHTML = `<strong>${messageOutput.fromUser}</strong>: ${messageOutput.text} <span class="timestamp">(${messageOutput.time})</span>`;
+      response.appendChild(p);
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #e8f4f8;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      font-weight: bold;
+      font-size: 2.5em;
+    }
+    .container {
+      width: 80%;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .input-group {
+      margin: 10px 0;
+      width: 100%;
+    }
+    input[type="text"] {
+      width: calc(100% - 22px);
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      background-color: #28a745;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+    }
+    button:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #response {
+      width: 100%;
+      max-height: 400px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: #f8f9fa;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+    p {
+      margin: 5px 0;
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    .timestamp {
+      color: #999;
+      font-size: 0.9em;
+    }
+    #conversationDiv {
+      width: 100%;
+      margin-top: 20px;
+    }
+    .flex-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+  </style>
+</head>
+<body onload="disconnect()">
+<header>
+  <h1>Kurakani</h1>
+</header>
+<div class="container">
+  <div class="input-group flex-container">
+    <input type="text" id="from" placeholder="Choose a nickname"/>
+    <input type="text" id="to" placeholder="Recipient nickname"/>
+  </div>
+  <div class="input-group flex-container">
+    <button id="connect" onclick="connect();">Connect</button>
+    <button id="disconnect" disabled="disabled" onclick="disconnect();">Disconnect</button>
+  </div>
+  <div id="conversationDiv">
+    <div class="input-group">
+      <input type="text" id="text" placeholder="Write a message..."/>
+      <button id="sendMessage" onclick="sendMessage();">Send</button>
+    </div>
+    <div id="response"></div>
+  </div>
+</div>
+</body>
+</html>

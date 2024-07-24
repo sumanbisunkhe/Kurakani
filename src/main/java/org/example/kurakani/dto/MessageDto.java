@@ -1,9 +1,18 @@
 package org.example.kurakani.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+
 public class MessageDto {
+
+    @NotEmpty(message = "Sender username cannot be empty.")
     private String fromUser;
+
+    @NotEmpty(message = "Receiver username cannot be empty.")
     private String toUser;
+
+    @NotEmpty(message = "Message text cannot be empty.")
     private String text;
+
 
     public MessageDto() {
     }

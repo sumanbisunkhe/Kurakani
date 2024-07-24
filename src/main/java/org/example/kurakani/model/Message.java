@@ -3,8 +3,6 @@ package org.example.kurakani.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
-
 @Entity
 public class Message {
     @Id
@@ -15,12 +13,12 @@ public class Message {
     private String text;
 
     @Column(nullable = false)
-    private LocalDateTime timestamp;
+    private String timestamp;
 
     public Message() {
     }
 
-    public Message(Long id, String fromUser, String toUser, String text, LocalDateTime timestamp) {
+    public Message(Long id, String fromUser, String toUser, String text, String timestamp) {
         this.id = id;
         this.fromUser = fromUser;
         this.toUser = toUser;
@@ -60,11 +58,11 @@ public class Message {
         this.text = text;
     }
 
-    public LocalDateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 }
